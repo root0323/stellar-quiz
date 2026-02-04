@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>바이어 명명법 퀴즈</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        #home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            font-size: 1rem;
+            background-color: #78909c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: none; /* Initially hidden, shown with quiz */
+        }
+        #home-btn:hover {
+            background-color: #607d8b;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem 3rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+        }
+        h1 {
+            color: #1a237e;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        #start-btn {
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background-color 0.3s;
+        }
+        #start-btn:hover {
+            background-color: #303f9f;
+        }
+        #question {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #3f51b5;
+            margin: 2rem 0;
+            letter-spacing: 2px;
+        }
+        #answer-input {
+            width: 80%;
+            padding: 0.8rem;
+            font-size: 1.2rem;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        #answer-input:focus {
+            outline: none;
+            border-color: #3f51b5;
+        }
+        #submit-btn, #next-btn {
+            width: 50%;
+            padding: 0.8rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background-color 0.3s;
+        }
+        #submit-btn {
+            background-color: #4caf50;
+        }
+        #submit-btn:hover {
+            background-color: #45a049;
+        }
+        #next-btn {
+            background-color: #1976d2;
+            display: none; /* Initially hidden */
+        }
+        #next-btn:hover {
+            background-color: #1565c0;
+        }
+        #feedback {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            height: 25px;
+        }
+        #score {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<button id="home-btn">홈</button>
+
+<div id="home-container" class="container">
+    <h1>바이어 명명법 퀴즈</h1>
+    <p>바이어 명명법을 보고<br>무슨 별자리인지 맞추세요!</p>
+    <button id="start-btn">퀴즈 시작하기</button>
+</div>
+
+<div id="quiz-container" class="container" style="display: none;">
+    <p>제시된 바이어 명명법을 보고 해당하는 별자리의 이름을 입력하세요.</p>
+    <div id="question"></div>
+    <input type="text" id="answer-input" placeholder="정답 입력..." autocomplete="off">
+    <br>
+    <button id="submit-btn">제출</button>
+    <button id="next-btn">다음 문제</button>
+    <div id="feedback"></div>
+    <div id="score">맞춘 개수: 0 / 진행: 0</div>
+</div>
+
+<script>
+    const csvData = `별자리 이름,영어 철자,약호
+안드로메다자리,Andromeda,And
+외뿔소자리,Monoceros,Mon
+궁수자리,Sagittarius,Sgr
+돌고래자리,Delphinus,Del
+인디언자리,Indus,Ind
+물고기자리,Pisces,Psc
+토끼자리,Lepus,Lep
+목동자리,Bootes,Boo
+바다뱀자리,Hydra,Hya
+에리다누스자리,Eridanus,Eri
+황소자리,Taurus,Tau
+큰개자리,Canis Major,CMa
+이리자리,Lupus,Lup
+큰곰자리,Ursa Major,UMa
+처녀자리,Virgo,Vir
+양자리,Aries,Ari
+오리온자리,Orion,Ori
+화가자리,Pictor,Pic
+카시오페이아자리,Cassiopeia,Cas
+황새치자리,Dorado,Dor
+게자리,Cancer,Cnc
+머리털자리,Coma Berenices,Com
+카멜레온자리,Chamaeleon,Cha
+까마귀자리,Corvus,Crv
+북쪽왕관자리,Corona Borealis,CrB
+큰부리새자리,Tucana,Tuc
+마차부자리,Auriga,Aur
+기린자리,Camelopardalis,Cam
+공작자리,Pavo,Pav
+고래자리,Cetus,Cet
+세페우스자리,Cepheus,Cep
+켄타우루스자리,Centaurus,Cen
+현미경자리,Microscopium,Mic
+작은개자리,Canis Minor,CMi
+조랑말자리,Equuleus,Equ
+여우자리,Vulpecula,Vul
+작은곰자리,Ursa Minor,UMi
+작은사자자리,Leo Minor,LMi
+컵자리,Crater,Crt
+거문고자리,Lyra,Lyr
+컴퍼스자리,Circinus,Cir
+제단자리,Ara,Ara
+전갈자리,Scorpius,Sco
+삼각형자리,Triangulum,Tri
+사자자리,Leo,Leo
+직각자자리,Norma,Nor
+방패자리,Scutum,Sct
+조각칼자리,Caelum,Cae
+조각가자리,Sculptor,Scl
+두루미자리,Grus,Gru
+테이블산자리,Mensa,Men
+천칭자리,Libra,Lib
+도마뱀자리,Lacerta,Lac
+시계자리,Horologium,Hor
+날치자리,Volans,Vol
+고물자리,Puppis,Pup
+파리자리,Musca,Mus
+백조자리,Cygnus,Cyg
+팔분의자리,Octans,Oct
+비둘기자리,Columba,Col
+극락조자리,Apus,Aps
+쌍둥이자리,Gemini,Gem
+페가수스자리,Pegasus,Peg
+뱀자리,Serpens,Ser
+뱀주인자리,Ophiuchus,Oph
+헤라클레스자리,Hercules,Her
+페르세우스자리,Perseus,Per
+돛자리,Vela,Vel
+망원경자리,Telescopium,Tel
+불사조자리,Phoenix,Phe
+공기펌프자리,Antlia,Ant
+물병자리,Aquarius,Aqr
+물뱀자리,Hydrus,Hyi
+남십자자리,Crux,Cru
+남쪽물고기자리,Piscis Austrinus,PsA
+남쪽왕관자리,Corona Austrina,CrA
+남쪽삼각형자리,Triangulum Australe,TrA
+화살자리,Sagitta,Sge
+염소자리,Capricornus,Cap
+스라소니자리,Lynx,Lyn
+나침반자리,Pyxis,Pyx
+용자리,Draco,Dra
+용골자리,Carina,Car
+사냥개자리,Canes Venatici,CVn
+그물자리,Reticulum,Ret
+화로자리,Fornax,For
+육분의자리,Sextans,Sex
+독수리자리,Aquila,Aql`;
+
+    const alternateNames = {
+        "이리자리": ["늑대자리"],
+        "스라소니자리": ["살쾡이자리"]
+    };
+
+    const lines = csvData.trim().split('\n');
+    const constellations = lines.slice(1).map(line => {
+        const values = line.split(',');
+        return {
+            name: values[0].trim(), // 별자리 이름
+            abbr: values[2].trim()  // 약호
+        };
+    });
+
+    const homeContainer = document.getElementById('home-container');
+    const quizContainer = document.getElementById('quiz-container');
+    const startBtn = document.getElementById('start-btn');
+    const homeBtn = document.getElementById('home-btn');
+    const questionEl = document.getElementById('question');
+    const answerInput = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const feedbackEl = document.getElementById('feedback');
+    const scoreEl = document.getElementById('score');
+
+    let currentConstellation = null;
+    let score = 0;
+    let questionsAsked = 0;
+    let remainingConstellations = [...constellations];
+
+    startBtn.addEventListener('click', () => {
+        homeContainer.style.display = 'none';
+        quizContainer.style.display = 'block';
+        homeBtn.style.display = 'block';
+        nextQuestion();
+    });
+
+    homeBtn.addEventListener('click', () => {
+        location.reload();
+    });
+
+    function nextQuestion() {
+        if (remainingConstellations.length === 0) {
+            const incorrectCount = constellations.length - score;
+            questionEl.textContent = '퀴즈 종료!';
+            feedbackEl.innerHTML = `맞춘 개수: <span style="color: green;">${score}</span>, 틀린 개수: <span style="color: red;">${incorrectCount}</span>`;
+            answerInput.style.display = 'none';
+            submitBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            scoreEl.style.display = 'none';
+            return;
+        }
+
+        questionsAsked++;
+        answerInput.value = '';
+        answerInput.disabled = false;
+        feedbackEl.textContent = '';
+        submitBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'none';
+
+        const randomIndex = Math.floor(Math.random() * remainingConstellations.length);
+        currentConstellation = remainingConstellations[randomIndex];
+        
+        remainingConstellations.splice(randomIndex, 1);
+
+        questionEl.textContent = currentConstellation.abbr;
+        scoreEl.textContent = `맞춘 개수: ${score} / 진행: ${questionsAsked} / ${constellations.length}`;
+        answerInput.focus();
+    }
+
+    function checkAnswer() {
+        const userAnswer = answerInput.value.trim();
+        if (!userAnswer) {
+            feedbackEl.textContent = '답을 입력해주세요.';
+            feedbackEl.style.color = 'orange';
+            return;
+        }
+
+        let correctAnswers = [currentConstellation.name];
+
+        if (alternateNames[currentConstellation.name]) {
+            correctAnswers = correctAnswers.concat(alternateNames[currentConstellation.name]);
+        }
+
+        const isCorrect = correctAnswers.includes(userAnswer);
+
+        answerInput.disabled = true;
+        submitBtn.style.display = 'none';
+        nextBtn.style.display = 'inline-block';
+
+        if (isCorrect) {
+            feedbackEl.textContent = '정답입니다!';
+            feedbackEl.style.color = 'green';
+        score++;
+        } else {
+            feedbackEl.textContent = `오답! (정답: ${correctAnswers.join(" 또는 ")})`;
+            feedbackEl.style.color = 'red';
+        }
+
+        scoreEl.textContent = `맞춘 개수: ${score} / 진행: ${questionsAsked} / ${constellations.length}`;
+    }
+
+
+    submitBtn.addEventListener('click', checkAnswer);
+    nextBtn.addEventListener('click', nextQuestion);
+    answerInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            if (submitBtn.style.display !== 'none') {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        }
+    });
+
+</script>
+
+</body>
+</html>
